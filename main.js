@@ -17,15 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = userCredential.user;
 
             // Guardar datos adicionales en Firestore
-            await db.collection('usuarios').doc(user.uid).set({
-                nombre: name,
+            await db.collection('users').doc(user.uid).set({
+                name: name,
                 email: email,
-                rol: 'donante', // Rol por defecto, se puede cambiar luego
-                ubicacion: new firebase.firestore.GeoPoint(0, 0) // Geopunto por defecto
+                role: 'donante', // Rol por defecto
+                location: new firebase.firestore.GeoPoint(0, 0) // Geopunto por defecto
             });
 
             console.log('Registro exitoso. Usuario:', user);
-            window.location.href = 'dashboard.html'; // Redirige al dashboard
+            window.location.href = 'home.html'; // Redirige al home
         } catch (error) {
             registerError.textContent = 'Error: ' + error.message;
             registerError.classList.remove('d-none');
@@ -39,20 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = loginForm['login-password'].value;
 
         try {
-            await auth.signInWithEmailAndPassword(email, password);
-            console.log('Inicio de sesión exitoso.');
-            window.location.href = 'dashboard.html'; // Redirige al dashboard
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            console.log('Inicio de sesión exitoso:', user.email);
+            window.location.href = 'home.html'; // Redirige al home
         } catch (error) {
             loginError.textContent = 'Error: ' + error.message;
             loginError.classList.remove('d-none');
         }
     });
 
-    // Escucha el estado de autenticación para redireccionar
+    // Escucha el estado de autenticación
     auth.onAuthStateChanged(user => {
         if (user) {
             console.log('Usuario autenticado:', user.email);
-            // Puedes redirigir aquí si es necesario
         } else {
             console.log('No hay usuario autenticado.');
         }
